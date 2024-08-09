@@ -10,14 +10,14 @@ Pre-requisites
 - kubectl installed
 - install aws-iam-authenticator (authenticate with EKS cluster)
 
-  Step 1 - Create a file `vpc.tf` and isnert the following code
+### Step 1 - Create a file `vpc.tf` and isnert the following code
 
-  ```
+```
   provider "aws" {
     region = "eu-west-1"
 }
 
-```
+
 variable vpc_cidr_block {}
 variable private_subnet_cidr_blocks {}
 variable public_subnet_cidr_blocks {}
@@ -57,7 +57,7 @@ module "myapp-vpc" {
 Here I configured the provider aws to the eu-west-1 region. I also created variables `vpc_cidr_block` private `private_subnet_cidr_blocks` `public_subnet_cidr_blocks`. 
 Then the `data` block is used to fetch information about the availability zone in a specified AWS region. Next is the module `myapp-vpc` which will create a VPC for th EKS cluster it contains both the private and public subnets. which we are referencing from the `terraform.tfvars`. Also enabled NAT gateway which provides outbond internet access for resources in a private subnet while keeping them protected from internet and also enabled DNS hostnames.Next we have a tag which contains the VPC and subnets for EKS integration and load balancers   
 
-step 2 - Configure the variables
+### step 2 - Configure the variables
 
 create a file called `terraform.tfvars` and add the following code:
 
@@ -68,7 +68,7 @@ public_subnet_cidr_blocks = ["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"]
 
 ````
 
-Step 3 - Eks cluster
+### Step 3 - Eks cluster
 create a file called `eks-cluster` to configure the EKS
 
 ```
@@ -114,7 +114,7 @@ Lastly the node group consist of:
 
 
  
-Step 4 provision your infrastructure
+### Step 4 provision your infrastructure
 To provision your infrastructure Run the command below
 ```
  terraform init
@@ -160,8 +160,9 @@ To configure `kubectl` with EKS cluster run the ocmmand below:
 ```
 aws eks update-kubeconfig --name my-app-eks-cluster --region eu-west-1
 ```
+I set the name of the cluster with the region.
 
-check the running nodes
+check the running worker nodes
 ```
 kubectl get nodes
 ```
@@ -169,7 +170,66 @@ kubectl get nodes
 
 ### Step 7 - Deploy nginx
 
+1. create a file called `nginx-deployment.yaml` and add the follwing code to it
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+
+```
+
+2. Apply the resources defined in the `nginx-deployment.yaml` file to the kubernetes clster
+```
+kubectl apply -f nginx-deployment.yaml
+```
+3. check all running podes
+
+```
+kubectl get pod
+```
+
+![Screenshot from 2024-08-08 21-39-18](https://github.com/user-attachments/assets/de4963f2-79ff-48e3-8aab-95dff7335690)
 
 
+4. Check the running load balancer
+![Screenshot from 2024-08-09 03-13-06](https://github.com/user-attachments/assets/53d3e290-b6b9-4ac0-b758-bf4fbb3cc273)
 
+![Screenshot from 2024-08-09 03-02-03](https://github.com/user-attachments/assets/3b2a590b-c12b-4ba7-81f8-75c5c0e42d65)
+
+   
+
+In this project, I used Terraform to set up an Amazon EKS (Elastic Kubernetes Service) cluster, configured the necessary IAM roles and policies, and ensured secure access to the cluster. The infrastructure includes a VPC with private and public subnets, and NAT gateways for managing network traffic. Additionally, I deployed a load balancer to evenly distribute incoming application traffic across the cluster's nodes, ensuring high availability and scalability. The cluster was integrated with Kubernetes to manage containerized applications, and I enabled auto-scaling for efficient resource management.
 
