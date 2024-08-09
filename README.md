@@ -4,9 +4,10 @@ In this porject we will create an vpc in eks cluster
 
 Pre-requisites
 
-- aws cli configured
+- AWS CLI configured
 - Ensure terraform is installed
 - Create IAM role on AWS
+- kubectl installed
 - install aws-iam-authenticator (authenticate with EKS cluster)
 
   Step 1 - Create a file `vpc.tf` and isnert the following code
