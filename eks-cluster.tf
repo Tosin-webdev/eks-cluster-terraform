@@ -16,7 +16,6 @@ module "eks"{
         application = "myapp"
     }
     
-
     eks_managed_node_group_defaults = {
         ami_type               = "AL2_x86_64"
         instance_types         = ["t3.medium"]
@@ -30,7 +29,6 @@ module "eks"{
       desired_size = 3
     }
   }
-
 }
 
 

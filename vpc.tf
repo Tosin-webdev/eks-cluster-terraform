@@ -5,7 +5,7 @@ provider "aws" {
 variable vpc_cidr_block {}
 variable private_subnet_cidr_blocks {}
 variable public_subnet_cidr_blocks {}
-
+# hen we create a variable for vpc_cidr_block to set the range of IP address that a resource will use. 
 data "aws_availability_zones" "azs" {}
 
 module "myapp-vpc" {
@@ -24,16 +24,16 @@ module "myapp-vpc" {
   enable_dns_hostnames = true 
 
   tags = {
-    "kubernetes.io/cluster/myapp-eks-cluster" = "shared"
+    "kubernetes.io/cluster/my-app-eks-cluster" = "shared"
   }
 
   public_subnet_tags = {
-    "kubernetes.io/cluster/myapp-eks-cluster" = "shared"
+    "kubernetes.io/cluster/my-app-eks-cluster" = "shared"
     "kubernetes.io/role/elb"                  = 1
   }
 
   private_subnet_tags = {
-    "kubernetes.io/cluster/myapp-eks-cluster" = "shared"
+    "kubernetes.io/cluster/my-app-eks-cluster" = "shared"
     "kubernetes.io/role/internal-elb"         = 1
   }
 }
