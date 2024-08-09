@@ -1,14 +1,14 @@
 ## Provision an EKS cluster using terraform
 
-In this porject we will create an vpc in eks cluster
+In this porject I created an eks cluster and also set up load balancer to evenly distribute incoming application traffic across the cluster's nodes
 
 Pre-requisites
 
-- AWS CLI configured
-- Ensure terraform is installed
-- Create IAM role on AWS
-- kubectl installed
-- install aws-iam-authenticator (authenticate with EKS cluster)
+- AWS CLI: Configured to interact with AWS services.
+- Terraform: Installed to manage your infrastructure as code.
+- IAM Role: Created on AWS to provide necessary permissions for managing the EKS cluster.
+- kubectl: Installed to interact with Kubernetes clusters.
+- aws-iam-authenticator: Installed to authenticate against the EKS cluster.
 
 ### Step 1 - Create a file `vpc.tf` and isnert the following code
 
@@ -105,13 +105,12 @@ module "eks"{
   }
 }
 ```
-Here the terrafomr configuration defines Amazon EKS cluster using a module from the terraform AWS module library. I has the name `my-app-eks-cluster.`. The `cluster_endpoint_public_access  = true
+Here the terraform configuration defines Amazon EKS cluster using a module from the terraform AWS module library. I has the name `my-app-eks-cluster.`. The `cluster_endpoint_public_access  = true
 ` allows the API server endpoint to be accessible from the internet. Then the subnet_ids with the vpc id are being referenced from the VPC module we created earlier. the `eks_managed_node_group_defaults` specifies the default configuration for EKS-managed node groups. I also set the ami_type to amazon linux 2. and the instance type to t3.medium
 Lastly the node group consist of:
 - `min_size`: The minimum number of instances in the node group. Here it's set to 3.
 - `max_size`: The maximum number of instances in the node group. Here it's set to 6.
 - `desired_size`: The desired number of instances in the node group. Here it's set to 3.
-
 
  
 ### Step 4 provision your infrastructure
@@ -168,7 +167,10 @@ kubectl get nodes
 ```
 ![AWSone](https://github.com/user-attachments/assets/5202363f-4ed3-4428-95ff-79637158f0ad)
 
-### Step 7 - Deploy nginx
+### Step 7 - Deploy nginx 
+
+In this section  I deployed an Nginx application to the EKS cluster. Also Created a Kubernetes Service of type LoadBalancer to expose the Nginx application externally.
+
 
 1. create a file called `nginx-deployment.yaml` and add the follwing code to it
 
@@ -210,6 +212,7 @@ spec:
       targetPort: 80
 
 ```
+
 
 2. Apply the resources defined in the `nginx-deployment.yaml` file to the kubernetes clster
 ```
